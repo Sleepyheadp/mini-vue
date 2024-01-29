@@ -45,16 +45,65 @@ function effectWatch(effect) {
 	currentEffect = null;
 }
 // 这里面的10,就相当于v1创建的a,b是根据a的变化来动态更新
-const dep = new Dep(10); // => 类比之前的 let a =10
-let b;
+const dep = new Dep(); // => 类比之前的 let a =10
+// let b;
 // 调用effect函数,并传入回调(逻辑关系)
-effectWatch(() => {
-	// [疑问🤔]这里取值为什么不用dep._val?
-	// 因为我们在上面创建了一个get方法,通过dep.getName触发get方法,从而拿到值
-	b = dep.getValue + 1;
-	console.log(b);
-});
+// effectWatch(() => {
+// 	// [疑问🤔]这里取值为什么不用dep._val?
+// 	// 因为我们在上面创建了一个get方法,通过dep.getName触发get方法,从而拿到值
+// 	b = dep.getValue + 1;
+// 	console.log(b);
+// });
 // 现在我们可以外部更新值了,从而触发依赖关系更新
-dep.setValue = 20; // 值已经改了,但是我们要通知去触发依赖
-dep.setValue = 30; // 现在就只需要修改dep的值,就可以触发依赖更新了
+// dep.setValue = 20; // 值已经改了,但是我们要通知去触发依赖
+// dep.setValue = 30; // 现在就只需要修改dep的值,就可以触发依赖更新了
 // dep.notice(); // 「疑问🤔」我们现在还是需要自己手动的去触发依赖,进行优化
+
+// 抽离逻辑
+let targetMap = new Map();
+function getDep(target, key) {
+	let depsMap = targetMap.get(target);
+	if (!depsMap) {
+		depsMap = new Map(); // 新创建一个Map
+		targetMap.set(target, depsMap); // 重新赋值
+	}
+
+	let dep = depsMap.get(key); // 拿到对应的dep,dep其实就是值value
+	if (!dep) {
+		dep = new Dep();
+		depsMap.set(key, dep); // 把键和值都传递过去
+	}
+	return dep;
+}
+// 接收一个参数raw
+// 定义一个targetMap合集,用来存储key和dep的关系
+
+function reactive(raw) {
+	// 第一个参数是我们要代理的对象,也就是我们传入的对象{name:"Jerry"}
+	// 第二个参数是一个对象,里面有get/set方法
+	return new Proxy(raw, {
+		// 接下来要做的事情就是实现get/set方法
+		get(target, key) {
+			// 「疑问🤔」get里边的处理有点绕,没理解
+			// target -> {name:"capoo"} key -> name value -> capoo
+			// 接下来的问题是 key和dep是一一对应的,也就是说我们需要一个key对应一个dep.
+			const dep = getDep(target, key);
+			dep.depend(); // 依赖收集
+			return Reflect.get(target, key);
+		},
+		set(target, key, value) {
+			const dep = getDep(target, key);
+			// 为什么要新建一个变量再返回呢?因为我们要先更新值并拿到,然后再去触发依赖.也就是通知它去更新
+			const result = Reflect.set(target, key, value); // newValue
+			dep.notice(); // 触发依赖
+			return result;
+		},
+	});
+}
+const user = reactive({ age: 18 }); // =>reactive(raw) => raw就是{name:"Jerry"}
+let changeAge;
+effectWatch(() => {
+	changeAge = user.age; // 初始执行一次18,set的时候执行一次19 => 18,19
+	console.log(changeAge);
+});
+user.age = 19; // 触发set方法
