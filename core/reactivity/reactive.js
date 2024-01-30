@@ -1,5 +1,5 @@
 let currentEffect;
-class Dep {
+export class Dep {
 	constructor(value) {
 		this.effects = new Set();
 		this._val = value;
@@ -65,6 +65,7 @@ export function reactive(data) {
 	});
 }
 
+// test
 const user = reactive({ age: 18 });
 let changeAge;
 effectWatch(() => {
