@@ -1,4 +1,5 @@
-import { effectWatch, reactive } from "./core/reactivity/reactive.js";
+import { effectWatch, reactive } from "./core/reactivity/index.js";
+import { createApp } from "./core/reactivity/index.js";
 // 结合UI视图更新
 const App = {
 	render(context) {
@@ -26,4 +27,5 @@ const App = {
 		return obj;
 	},
 };
-App.render(App.setup());
+// App.render(App.setup());
+createApp(App).mount(document.querySelector("#app"));
