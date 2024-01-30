@@ -49,8 +49,8 @@ function getDep(target, key) {
 	return dep;
 }
 
-export function reactive(raw) {
-	return new Proxy(raw, {
+export function reactive(data) {
+	return new Proxy(data, {
 		get(target, key) {
 			const dep = getDep(target, key);
 			dep.depend();
