@@ -1,12 +1,4 @@
 import { Dep, effectWatch, reactive } from "./reactive.js";
+import { createApp } from "../createApp.js";
+export { createApp };
 export { Dep, effectWatch, reactive };
-
-// createApp(App).mount("#app"); -> 官方写法
-export const createApp = (rootContainer) => {
-	return {
-		mount() {
-			const result = rootContainer.setup();
-			rootContainer.render(result);
-		},
-	};
-};
