@@ -14,14 +14,16 @@ const App = {
 		// dom.append(button);
 		// return dom;
 		/* virtual dom => h */
-		return h("div", {}, [
-			h("span", {}, "num:"),
-			h("span", {}, context.num),
+		/* 当children为string类型时 */
+		// return h("div", { id: "capoo" }, "hello h function");
+		return h("div", { id: "capoo", class: "test" }, [
+			h("span", {}, "count:"),
+			h("span", {}, String(context.obj.count)),
 			h(
 				"button",
 				{
 					onClick: () => {
-						context.num++;
+						context.count++;
 					},
 				},
 				"add"
@@ -30,9 +32,10 @@ const App = {
 	},
 	setup() {
 		let obj = reactive({
-			num: 0,
+			count: 0,
 		});
-		return obj;
+		window.obj = obj; // 为了方便调试,将obj挂载到window上
+		return { obj };
 	},
 };
 export default App;

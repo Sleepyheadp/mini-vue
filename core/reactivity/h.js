@@ -1,7 +1,7 @@
-export function h(tag, pors, children) {
+export function h(tag, props, children) {
 	return {
 		tag,
-		pors,
+		props,
 		children,
 	};
 }
