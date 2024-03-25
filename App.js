@@ -16,23 +16,47 @@ const App = {
 		/* virtual dom => h */
 		/* 当children为string类型时 */
 		// return h("div", { id: "capoo" }, "hello h function");
+		// [注意] 第三个值是children.
 		return h("div", { id: "capoo", class: "test" }, [
-			h("span", {}, "count:"),
-			h("span", {}, String(context.obj.count)),
+			h(context.obj.tag, context.obj.propsUpdate, "count:"),
+			h(context.obj.tag, context.obj.propsAdd, String(context.obj.count)),
 			h(
 				"button",
 				{
 					onClick: () => {
-						context.count++;
+						context.obj.count + 1;
+						console.log("addCount");
+					},
+					...context.obj.propsRemove,
+				},
+				"addCount"
+			),
+			h(
+				"button",
+				{
+					onClick: () => {
+						context.obj.tag = "p";
+						console.log("changeTag");
 					},
 				},
-				"add"
+				"changeTag"
 			),
 		]);
 	},
 	setup() {
 		let obj = reactive({
 			count: 0,
+			tag: "span",
+			propsUpdate: {
+				a: "a1",
+			},
+			propsAdd: {
+				a: "a2",
+			},
+			propsRemove: {
+				a: "a3",
+				b: "b1",
+			},
 		});
 		window.obj = obj; // 为了方便调试,将obj挂载到window上
 		return { obj };
