@@ -27,7 +27,6 @@ export class Dep {
 export function effectWatch(effect) {
 	currentEffect = effect;
 	effect();
-	dep.depend();
 	currentEffect = null;
 }
 
@@ -64,13 +63,3 @@ export function reactive(data) {
 		},
 	});
 }
-
-// test
-const user = reactive({ age: 18 });
-let changeAge;
-effectWatch(() => {
-	changeAge = user.age;
-	// console.log(changeAge);
-});
-user.age = 19;
-user.age = 20;
