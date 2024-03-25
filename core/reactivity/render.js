@@ -15,6 +15,9 @@ function insert(el, parent) {
 function createTextNode(node) {
 	return document.createTextNode(node);
 }
+function removeChild(parent, el) {
+	parent.removeChild(el);
+}
 
 export function mountElement(vnode, container) {
 	const { tag, props, children } = vnode;
@@ -82,6 +85,42 @@ export function diff(v1, v2) {
 			// 2. old array -> new string
 			else if (Array.isArray(oldChildren)) {
 				el.innerText = newChildren;
+			}
+		} else if (Array.isArray(newChildren)) {
+			// 3. old array -> new string
+			if (typeof oldChildren === "string") {
+				el.innerText = "";
+				newChildren.forEach((v) => {
+					mountElement(v, el);
+				});
+			}
+			// 4. old array -> new array
+			// 4.1 依次对比 old / new children
+			// 4.2 新增的部分 add
+			// 4.3 删除的部分 remove
+			else if (Array.isArray(oldChildren)) {
+				// 获取最小长度
+				const length = Math.min(newChildren, oldChildren);
+				// 1. 依次对比
+				for (let i = 0; i < length; i++) {
+					const newVnode = newChildren[i];
+					const oldVnode = oldChildren[i];
+					diff(oldVnode, newVnode);
+				}
+				// 2. add new > old
+				if (newChildren.length > length) {
+					for (let i = length; i < newChildren.length; i++) {
+						const vnode = newChildren[i];
+						mountElement(vnode, el);
+					}
+				}
+				// 3. remove new < old
+				if (oldChildren.length > length) {
+					for (let i = length; i < oldChildren.length; i++) {
+						const vnode = oldChildren[i];
+						removeChild(el, vnode.el);
+					}
+				}
 			}
 		}
 	}
