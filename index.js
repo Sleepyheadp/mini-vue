@@ -8,8 +8,9 @@ export const createApp = (rootComponent) => {
 			const result = rootComponent.setup();
 			effectWatch(() => {
 				rootContainer.innerHTML = ""; // 每次都清空
-				const element = rootComponent.render(result); // dom更新
-				rootContainer.append(element);
+				const subTree = rootComponent.render(result); // dom更新
+				console.log(subTree);
+				// rootContainer.append(element);
 			});
 		},
 	};
