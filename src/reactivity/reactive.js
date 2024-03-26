@@ -31,23 +31,6 @@ export function effectWatch(effect) {
 }
 
 const dep = new Dep();
-
-let targetMap = new Map();
-function getDep(target, key) {
-	let depsMap = targetMap.get(target);
-	if (!depsMap) {
-		depsMap = new Map();
-		targetMap.set(target, depsMap);
-	}
-
-	let dep = depsMap.get(key);
-	if (!dep) {
-		dep = new Dep();
-		depsMap.set(key, dep);
-	}
-	return dep;
-}
-
 export function reactive(data) {
 	return new Proxy(data, {
 		get(target, key) {
